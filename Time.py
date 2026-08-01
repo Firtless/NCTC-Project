@@ -6,18 +6,15 @@ timer_popup = None
 
 
 def format_time(seconds):
-    whole_seconds = int(seconds)
-    milliseconds = seconds - whole_seconds
-
-    minutes, secs = divmod(whole_seconds, 60)
-    hours, mins = divmod(minutes, 60)
+    whole, ms = int(seconds), seconds - int(seconds)
+    mins, secs = divmod(whole, 60)
+    hours, mins = divmod(mins, 60)
 
     if hours > 0:
-        return f"{hours}h {mins}m {secs + milliseconds:.2f}s"
-    elif mins > 0:
-        return f"{mins}m {secs + milliseconds:.2f}s"
-    else:
-        return f"{seconds:.2f} seconds"
+        return f"{hours}h {mins}m {secs + ms:.2f}s"
+    if mins > 0:
+        return f"{mins}m {secs + ms:.2f}s"
+    return f"{seconds:.2f} seconds"
 
 
 def open_timer_popup():
@@ -27,9 +24,9 @@ def open_timer_popup():
         timer_popup.lift()
         return
 
-    start_time = [None]
-    elapsed_time = [0.0]
-    is_running = [False]
+    start_time = None
+    elapsed_time = 0.0
+    is_running = False
 
     timer_popup = tk.Tk()
     timer_popup.title("NCTC Timer")
@@ -47,32 +44,36 @@ def open_timer_popup():
     label.pack(pady=(12, 8))
 
     def tick():
-        if is_running[0] and timer_popup.winfo_exists():
-            current_elapsed = elapsed_time[0] + (time.time() - start_time[0])
-            label.config(text=format_time(current_elapsed))
+        if is_running and timer_popup.winfo_exists():
+            current = elapsed_time + (time.time() - start_time)
+            label.config(text=format_time(current))
             timer_popup.after(100, tick)
 
     def on_start():
-        if not is_running[0]:
-            is_running[0] = True
-            start_time[0] = time.time()
+        nonlocal is_running, start_time
+        if not is_running:
+            is_running = True
+            start_time = time.time()
             tick()
 
     def on_stop():
-        if is_running[0]:
-            is_running[0] = False
-            elapsed_time[0] += time.time() - start_time[0]
-            label.config(text=format_time(elapsed_time[0]))
+        nonlocal is_running, elapsed_time
+        if is_running:
+            is_running = False
+            elapsed_time += time.time() - start_time
+            label.config(text=format_time(elapsed_time))
 
     def on_reset():
-        is_running[0] = False
-        start_time[0] = None
-        elapsed_time[0] = 0.0
+        nonlocal is_running, start_time, elapsed_time
+        is_running = False
+        start_time = None
+        elapsed_time = 0.0
         label.config(text="0.00 seconds")
 
     def on_quit():
         global timer_popup
-        is_running[0] = False
+        nonlocal is_running
+        is_running = False
         if timer_popup:
             timer_popup.destroy()
             timer_popup = None
@@ -85,7 +86,7 @@ def open_timer_popup():
     btn_style = {
         "font": ("Helvetica", 12, "bold"),
         "bg": "#2D2D2D",
-        "fg": "#A4A4A4",
+        "fg": "#E1E1E1",
         "activebackground": "#3E3E3E",
         "activeforeground": "#00E5FF",
         "borderless": 1,
@@ -93,19 +94,16 @@ def open_timer_popup():
         "pady": 3,
     }
 
-    start_btn = Button(btn_frame, text="Start",
-                       command=on_start, **btn_style)
-    start_btn.pack(side="left", padx=4)
+    buttons = [
+        ("Start", on_start),
+        ("Stop", on_stop),
+        ("Reset", on_reset),
+        ("Quit", on_quit),
+    ]
 
-    stop_btn = Button(btn_frame, text="Stop", command=on_stop, **btn_style)
-    stop_btn.pack(side="left", padx=4)
-
-    reset_btn = Button(btn_frame, text="Reset",
-                       command=on_reset, **btn_style)
-    reset_btn.pack(side="left", padx=4)
-
-    quit_btn = Button(btn_frame, text="Quit", command=on_quit, **btn_style)
-    quit_btn.pack(side="left", padx=4)
+    for text, cmd in buttons:
+        btn = Button(btn_frame, text=text, command=cmd, **btn_style)
+        btn.pack(side="left", padx=4)
 
     print("[NCTC] Floating timer opened.")
     timer_popup.mainloop()
