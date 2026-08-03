@@ -1,0 +1,4 @@
+
+Session ended: 2026-08-03 11:14
+===================================
+just a test messege to see how the code behaves and where I left of and what to improve
