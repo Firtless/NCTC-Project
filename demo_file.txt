@@ -2,3 +2,15 @@
 Session ended: 2026-08-03 11:14
 ===================================
 just a test messege to see how the code behaves and where I left of and what to improve
+
+Session ended: 2026-08-04 22:32
+===================================
+BARRITE its almost done, the project where I usmy brain and not just copy pasting AI slop from thents, I am so glad!!!
+
+Session ended: 2026-08-04 23:01
+===================================
+another test to see how useful this would e in a situation, and I gotta say I will most likely remake or improve the note taking experience becuase its too clunky for now but fine at the same time since that terminal junk is how I want this project to feel
+
+Session ended: 2026-08-04 23:03
+===================================
+test
